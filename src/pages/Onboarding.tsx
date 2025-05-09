@@ -2,84 +2,90 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import RPGDialog from '../components/RPGDialog';
 import MushuAvatar from '../components/MushuAvatar';
+import { useUser } from '../contexts/UserContext';
 
-const Onboarding: React.FC = () => {
+const Onboarding = () => {
+  const { isLoggedIn } = useUser();
   const navigate = useNavigate();
-  const [step, setStep] = useState<number>(0);
-  
-  const onboardingSteps = [
-    {
-      text: "¡Bienvenido a MushuMind! Soy Mushu, tu compañero en esta aventura hacia el bienestar mental.",
-      speaker: "Mushu"
-    },
-    {
-      text: "Con MushuMind podrás rastrear tus emociones, completar misiones diarias, ganar recompensas y más.",
-      speaker: "Mushu"
-    },
-    {
-      text: "¡Todo con un estilo de videojuego RPG que hace que cuidar tu salud mental sea divertido!",
-      speaker: "Mushu"
-    },
-    {
-      text: "¿Estás listo para comenzar tu aventura?",
-      speaker: "Mushu",
-      isLast: true
+  const [step, setStep] = useState(1);
+
+  // If already logged in, redirect to main menu
+  React.useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/menu');
     }
-  ];
+  }, [isLoggedIn, navigate]);
   
-  const nextStep = () => {
-    if (step < onboardingSteps.length - 1) {
+  const handleNext = () => {
+    if (step < 3) {
       setStep(step + 1);
     } else {
       navigate('/login');
     }
   };
   
-  const skipOnboarding = () => {
+  const handleSkip = () => {
     navigate('/login');
   };
-  
-  const currentStep = onboardingSteps[step];
-  
+
   return (
-    <div 
-      className="min-h-screen bg-gradient-to-b from-mushu-light to-white flex flex-col items-center justify-center p-4"
-    >
-      <div className="w-full max-w-md flex flex-col items-center">
-        <h1 className="text-4xl font-bold text-mushu-dark mb-8 animate-fade-in">
-          MushuMind
-        </h1>
+    <div className="min-h-screen bg-gradient-to-b from-mushu-light to-white p-4">
+      <div className="max-w-md mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-sm">
+            {step}/3
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleSkip}
+          >
+            Saltar
+          </Button>
+        </div>
         
-        <div className="mb-8 animate-bounce-slight">
+        <div className="flex justify-center mb-6">
           <MushuAvatar size="xl" animate={true} />
         </div>
         
-        <div className="w-full">
-          <RPGDialog
-            text={currentStep.text}
-            speaker={currentStep.speaker}
-            onContinue={nextStep}
-            className="animate-fade-in"
+        <div className="rpg-border">
+          {step === 1 && (
+            <div>
+              <h1 className="text-2xl font-bold mb-4">¡Hola! Soy Mushu</h1>
+              <p className="mb-4">
+                Tu compañero emocional que te ayudará a entender y gestionar tus emociones
+                mientras te diviertes.
+              </p>
+            </div>
+          )}
+          
+          {step === 2 && (
+            <div>
+              <h1 className="text-2xl font-bold mb-4">Crece junto a mí</h1>
+              <p className="mb-4">
+                Completa misiones, registra tus emociones y gana experiencia.
+                ¡Juntos superaremos los desafíos emocionales!
+              </p>
+            </div>
+          )}
+          
+          {step === 3 && (
+            <div>
+              <h1 className="text-2xl font-bold mb-4">¡Estamos listos!</h1>
+              <p className="mb-4">
+                Crea una cuenta para comenzar tu viaje con Mushu.
+                ¡Tu bienestar emocional es nuestra misión!
+              </p>
+            </div>
+          )}
+          
+          <Button 
+            onClick={handleNext} 
+            className="w-full rpg-button mt-4"
           >
-            {currentStep.isLast && (
-              <div className="flex justify-between mt-4">
-                <Button 
-                  onClick={skipOnboarding} 
-                  variant="outline"
-                >
-                  Saltar
-                </Button>
-                <Button 
-                  onClick={nextStep} 
-                  className="rpg-button"
-                >
-                  ¡Vamos!
-                </Button>
-              </div>
-            )}
-          </RPGDialog>
+            {step < 3 ? 'Continuar' : 'Comenzar'}
+          </Button>
         </div>
       </div>
     </div>

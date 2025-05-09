@@ -22,6 +22,7 @@ import MiniGame from "./pages/MiniGame";
 import Calendar from "./pages/Calendar";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +37,8 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  <Route path="/" element={<Onboarding />} />
+                  <Route path="/" element={<Index />} />
+                  <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/menu" element={<MainMenu />} />
                   <Route path="/emotion-check" element={<EmotionCheck />} />
