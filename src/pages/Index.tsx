@@ -20,7 +20,7 @@ const Index = () => {
         <div className="space-y-4">
           <Button 
             onClick={() => navigate('/onboarding')} 
-            className="w-full rpg-button"
+            className="w-full bg-mushu-primary hover:bg-mushu-dark text-white"
           >
             Comenzar
           </Button>
