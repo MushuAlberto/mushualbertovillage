@@ -11,7 +11,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-mushu-light to-white p-4 flex flex-col items-center justify-center">
       <div className="text-center max-w-md mx-auto">
         <div className="mb-8">
-          <MushuAvatar size="xl" animate={true} />
+          <MushuAvatar size="xl" animate={true} mood="happy" />
         </div>
         
         <h1 className="text-4xl font-bold mb-4 text-mushu-dark">Mushu</h1>

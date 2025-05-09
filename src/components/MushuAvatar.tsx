@@ -5,17 +5,21 @@ import { useMushu } from '../contexts/MushuContext';
 interface MushuAvatarProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   animate?: boolean;
+  mood?: 'happy' | 'sad' | 'excited' | 'sleepy' | 'confused' | 'normal';
 }
 
 const MushuAvatar: React.FC<MushuAvatarProps> = ({ 
   size = 'md', 
-  animate = true 
+  animate = true,
+  mood: propMood
 }) => {
-  const { mushuState, getEquippedAccessories } = useMushu();
-  const { mood } = mushuState;
+  const mushuContext = useMushu();
   const [animation, setAnimation] = useState('');
   
-  const equippedAccessories = getEquippedAccessories();
+  // Use the mood from props if provided, otherwise use the one from context
+  const mood = propMood || (mushuContext ? mushuContext.mushuState.mood : 'normal');
+  
+  const equippedAccessories = mushuContext ? mushuContext.getEquippedAccessories() : [];
   
   // Set size class
   const sizeClass = {
