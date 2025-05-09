@@ -5,7 +5,7 @@ import { useUser } from '../contexts/UserContext';
 import MushuAvatar from '../components/MushuAvatar';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shirt, User, Glasses, Footprints } from 'lucide-react';
+import { Shirt, User2, Glasses, Footprints } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface AccessoryProps {
@@ -100,7 +100,7 @@ const Customization: React.FC = () => {
           <TabsList className="grid grid-cols-5 mb-6">
             <TabsTrigger value="all">Todos</TabsTrigger>
             <TabsTrigger value="hat">
-              <User size={18} />
+              <User2 size={18} />
             </TabsTrigger>
             <TabsTrigger value="glasses">
               <Glasses size={18} />
