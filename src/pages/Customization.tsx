@@ -5,7 +5,7 @@ import { useUser } from '../contexts/UserContext';
 import MushuAvatar from '../components/MushuAvatar';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shirt, Hat, Glasses, Shoe } from 'lucide-react';
+import { Shirt, User, Glasses, Footprints } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface AccessoryProps {
@@ -71,7 +71,7 @@ const Customization: React.FC = () => {
   };
   
   const handleEquipAccessory = (accessoryId: string) => {
-    equipAccessory(accessoryId);
+    equipAccessory(accessoryId, true);
     toast({
       title: "Accesorio equipado",
       description: "Has cambiado la apariencia de Mushu",
@@ -100,7 +100,7 @@ const Customization: React.FC = () => {
           <TabsList className="grid grid-cols-5 mb-6">
             <TabsTrigger value="all">Todos</TabsTrigger>
             <TabsTrigger value="hat">
-              <Hat size={18} />
+              <User size={18} />
             </TabsTrigger>
             <TabsTrigger value="glasses">
               <Glasses size={18} />
@@ -109,7 +109,7 @@ const Customization: React.FC = () => {
               <Shirt size={18} />
             </TabsTrigger>
             <TabsTrigger value="shoes">
-              <Shoe size={18} />
+              <Footprints size={18} />
             </TabsTrigger>
           </TabsList>
           
@@ -118,7 +118,7 @@ const Customization: React.FC = () => {
               <AccessoryItem
                 key={accessory.id}
                 accessory={accessory}
-                isEquipped={mushuState.equippedAccessories.includes(accessory.id)}
+                isEquipped={accessory.equipped}
                 isLocked={!accessory.unlocked}
                 onEquip={() => handleEquipAccessory(accessory.id)}
               />
