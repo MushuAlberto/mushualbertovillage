@@ -16,7 +16,7 @@ const Dashboard: React.FC = () => {
 
   // Prepare emotion data for the chart
   const emotionData = emotionHistory.slice(-14).map(entry => ({
-    date: new Date(entry.timestamp).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
+    date: new Date(entry.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
     emotion: entry.emotion,
     intensity: entry.intensity
   }));

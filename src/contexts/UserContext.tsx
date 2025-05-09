@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface User {
@@ -10,6 +9,10 @@ export interface User {
   xpToNextLevel: number;
   avatar: string;
   created: Date;
+  completedMissions?: number;
+  achievements?: any[];
+  streak?: number;
+  totalXp?: number;
 }
 
 interface UserContextType {
@@ -20,6 +23,8 @@ interface UserContextType {
   register: (name: string, email: string, password: string) => Promise<boolean>;
   updateXP: (amount: number) => void;
   resetProgress: () => void;
+  addUserXp: (amount: number) => void;
+  resetUserData: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -158,6 +163,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('mushu_customization');
   };
   
+  const addUserXp = (amount: number) => {
+    updateXP(amount);
+  };
+  
+  const resetUserData = () => {
+    resetProgress();
+  };
+  
   const value = {
     user,
     isLoggedIn: !!user,
@@ -165,7 +178,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     register,
     updateXP,
-    resetProgress
+    resetProgress,
+    addUserXp,
+    resetUserData
   };
   
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

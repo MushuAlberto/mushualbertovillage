@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useUser } from './UserContext';
 
@@ -8,6 +7,7 @@ export interface EmotionRecord {
   intensity: number;
   note: string;
   date: string;
+  timestamp: string; // Added timestamp property
 }
 
 interface EmotionContextType {
@@ -58,7 +58,8 @@ export const EmotionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       emotion,
       intensity,
       note,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
     
     setCurrentEmotion(newRecord);

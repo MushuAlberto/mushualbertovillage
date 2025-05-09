@@ -27,7 +27,7 @@ const Calendar: React.FC = () => {
     });
     
     const dateEmotions = emotionHistory.filter(emotion => {
-      const emotionDate = formatDate(new Date(emotion.timestamp), 'yyyy-MM-dd');
+      const emotionDate = formatDate(new Date(emotion.date), 'yyyy-MM-dd');
       return emotionDate === formattedDate;
     });
     
@@ -82,7 +82,7 @@ const Calendar: React.FC = () => {
                     <div>
                       <div className="font-medium">{emotion.emotion}</div>
                       <div className="text-xs text-gray-500">
-                        {formatDate(new Date(emotion.timestamp), 'HH:mm')}
+                        {formatDate(new Date(emotion.date), 'HH:mm')}
                       </div>
                       {emotion.note && (
                         <div className="text-sm mt-1">{emotion.note}</div>
