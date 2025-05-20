@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import MushuAvatar from '../components/MushuAvatar';
-import { Meditation } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
 interface MindfulnessActivity {
   id: string;
@@ -151,7 +150,7 @@ const Mindfulness: React.FC = () => {
         <Card className="mb-6 shadow-lg bg-white/80 backdrop-blur">
           <CardHeader>
             <div className="flex items-center">
-              <Meditation className="mr-2" />
+              <BookOpen className="mr-2" />
               <h2 className="text-xl font-bold">Jardín de Serenidad</h2>
             </div>
             <p className="text-sm text-gray-600">

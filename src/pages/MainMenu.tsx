@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
@@ -18,7 +17,7 @@ import {
   Smile, 
   Gamepad,
   Dumbbell,
-  Meditation 
+  BookOpen 
 } from 'lucide-react';
 
 const MainMenu: React.FC = () => {
@@ -150,7 +149,7 @@ const MainMenu: React.FC = () => {
             to="/gym" 
           />
           <MenuButton 
-            icon={<Meditation size={24} />} 
+            icon={<BookOpen size={24} />} 
             label="Jardín" 
             to="/mindfulness" 
           />
