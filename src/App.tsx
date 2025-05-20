@@ -26,43 +26,46 @@ import Index from "./pages/Index";
 import Gym from "./pages/Gym";
 import Mindfulness from "./pages/Mindfulness";
 
-const queryClient = new QueryClient();
+const App = () => {
+  // Create a new QueryClient instance inside the component
+  const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <UserProvider>
-          <EmotionProvider>
-            <MushuProvider>
-              <MissionProvider>
-                <Toaster />
-                <Sonner />
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/menu" element={<MainMenu />} />
-                  <Route path="/emotion-check" element={<EmotionCheck />} />
-                  <Route path="/chat" element={<ChatBot />} />
-                  <Route path="/missions" element={<Missions />} />
-                  <Route path="/achievements" element={<Achievements />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/customization" element={<Customization />} />
-                  <Route path="/mini-game" element={<MiniGame />} />
-                  <Route path="/gym" element={<Gym />} />
-                  <Route path="/mindfulness" element={<Mindfulness />} />
-                  <Route path="/calendar" element={<Calendar />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </MissionProvider>
-            </MushuProvider>
-          </EmotionProvider>
-        </UserProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <UserProvider>
+            <EmotionProvider>
+              <MushuProvider>
+                <MissionProvider>
+                  <Toaster />
+                  <Sonner />
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/onboarding" element={<Onboarding />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/menu" element={<MainMenu />} />
+                    <Route path="/emotion-check" element={<EmotionCheck />} />
+                    <Route path="/chat" element={<ChatBot />} />
+                    <Route path="/missions" element={<Missions />} />
+                    <Route path="/achievements" element={<Achievements />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/customization" element={<Customization />} />
+                    <Route path="/mini-game" element={<MiniGame />} />
+                    <Route path="/gym" element={<Gym />} />
+                    <Route path="/mindfulness" element={<Mindfulness />} />
+                    <Route path="/calendar" element={<Calendar />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </MissionProvider>
+              </MushuProvider>
+            </EmotionProvider>
+          </UserProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
