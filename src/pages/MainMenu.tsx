@@ -16,7 +16,9 @@ import {
   BarChart2, 
   Settings, 
   Smile, 
-  Gamepad 
+  Gamepad,
+  Dumbbell,
+  Meditation 
 } from 'lucide-react';
 
 const MainMenu: React.FC = () => {
@@ -93,6 +95,16 @@ const MainMenu: React.FC = () => {
           <MushuAvatar size="xl" animate={true} />
         </div>
         
+        <div className="mb-4 text-center">
+          <Button
+            onClick={() => navigate('/')}
+            className="bg-mushu-dark hover:bg-mushu-primary"
+            size="lg"
+          >
+            Ir al Pueblo
+          </Button>
+        </div>
+        
         {/* Main Menu Grid */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <MenuButton 
@@ -109,7 +121,7 @@ const MainMenu: React.FC = () => {
           />
           <MenuButton 
             icon={<MessageSquare size={24} />} 
-            label="Chat" 
+            label="Cafetería" 
             to="/chat" 
           />
           <MenuButton 
@@ -128,14 +140,24 @@ const MainMenu: React.FC = () => {
             to="/customization" 
           />
           <MenuButton 
+            icon={<Gamepad size={24} />} 
+            label="Arcade" 
+            to="/mini-game" 
+          />
+          <MenuButton 
+            icon={<Dumbbell size={24} />} 
+            label="Gimnasio" 
+            to="/gym" 
+          />
+          <MenuButton 
+            icon={<Meditation size={24} />} 
+            label="Jardín" 
+            to="/mindfulness" 
+          />
+          <MenuButton 
             icon={<Calendar size={24} />} 
             label="Calendario" 
             to="/calendar" 
-          />
-          <MenuButton 
-            icon={<Gamepad size={24} />} 
-            label="Mini-Juego" 
-            to="/mini-game" 
           />
         </div>
         

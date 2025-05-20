@@ -23,6 +23,8 @@ import Calendar from "./pages/Calendar";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+import Gym from "./pages/Gym";
+import Mindfulness from "./pages/Mindfulness";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,8 @@ const App = () => (
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/customization" element={<Customization />} />
                   <Route path="/mini-game" element={<MiniGame />} />
+                  <Route path="/gym" element={<Gym />} />
+                  <Route path="/mindfulness" element={<Mindfulness />} />
                   <Route path="/calendar" element={<Calendar />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="*" element={<NotFound />} />
