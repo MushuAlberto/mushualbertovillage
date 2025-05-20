@@ -13,10 +13,17 @@ const Mindfulness: React.FC = () => {
   const navigate = useNavigate();
   const [selectedActivity, setSelectedActivity] = useState<MindfulnessActivity | null>(null);
   const [isActiveSession, setIsActiveSession] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('all');
   
   const handleSelectActivity = (activity: MindfulnessActivity) => {
     setSelectedActivity(activity);
     setIsActiveSession(false);
+  };
+
+  const handleFilterChange = (filter: string) => {
+    setActiveFilter(filter);
+    // Reset selection when filter changes
+    setSelectedActivity(null);
   };
   
   return (
@@ -49,6 +56,8 @@ const Mindfulness: React.FC = () => {
               activities={mindfulnessActivities}
               selectedActivityId={selectedActivity?.id || null}
               onSelectActivity={handleSelectActivity}
+              activeFilter={activeFilter}
+              onFilterChange={handleFilterChange}
             />
             
             {selectedActivity && (
