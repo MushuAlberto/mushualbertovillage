@@ -1,7 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Bell } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { MindfulnessActivity } from './types';
 
 interface ActivityDetailsProps {
@@ -12,22 +15,55 @@ interface ActivityDetailsProps {
 const ActivityDetails: React.FC<ActivityDetailsProps> = ({ activity, onFinish }) => {
   const [isActive, setIsActive] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [totalTime, setTotalTime] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Create audio element for completion sound
+    audioRef.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bell-meditation-sound-2000.mp3');
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     let interval: number | undefined;
     
     if (isActive && timer > 0) {
       interval = window.setInterval(() => {
-        setTimer(timer => timer - 1);
+        setTimer(prevTimer => {
+          const newTime = prevTimer - 1;
+          // Calculate progress percentage
+          const progressValue = 100 - (newTime / totalTime * 100);
+          setProgress(progressValue);
+          return newTime;
+        });
       }, 1000);
     } else if (timer === 0 && isActive) {
       setIsActive(false);
+      // Play completion sound
+      if (audioRef.current) {
+        audioRef.current.play().catch(e => console.error("Could not play sound:", e));
+      }
+      // Show completion toast
+      toast({
+        title: "¡Meditación completada!",
+        description: `Has completado ${activity.name} con éxito.`,
+        duration: 5000,
+      });
+      onFinish();
     }
     
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, timer]);
+  }, [isActive, timer, totalTime, activity.name, onFinish, toast]);
 
   // Format seconds to mm:ss
   const formatTime = (seconds: number): string => {
@@ -42,7 +78,9 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({ activity, onFinish })
     const durationMatch = activity.duration.match(/\d+/);
     const durationInMinutes = durationMatch ? parseInt(durationMatch[0]) : 5;
     const durationInSeconds = durationInMinutes * 60;
+    setTotalTime(durationInSeconds);
     setTimer(durationInSeconds);
+    setProgress(0);
   };
 
   return (
@@ -50,8 +88,11 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({ activity, onFinish })
       <CardHeader>
         <h2 className="text-xl font-bold text-center">{activity.name}</h2>
         {isActive && (
-          <div className="text-center text-4xl font-mono my-4">
-            {formatTime(timer)}
+          <div className="space-y-4">
+            <div className="text-center text-4xl font-mono my-2">
+              {formatTime(timer)}
+            </div>
+            <Progress value={progress} className="h-2" />
           </div>
         )}
       </CardHeader>
@@ -80,7 +121,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({ activity, onFinish })
             className="w-full bg-mushu-primary hover:bg-mushu-dark"
             onClick={handleStart}
           >
-            Comenzar {activity.name}
+            <Bell className="mr-2 h-4 w-4" /> Comenzar {activity.name}
           </Button>
         )}
       </CardFooter>

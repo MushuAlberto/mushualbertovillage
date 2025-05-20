@@ -6,4 +6,5 @@ export interface MindfulnessActivity {
   duration: string;
   type: 'meditación' | 'respiración' | 'relajación';
   instructions: string[];
+  completed?: boolean;
 }
