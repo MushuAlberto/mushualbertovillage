@@ -17,6 +17,11 @@ export interface MushuState {
   accessories: MushuAccessory[];
   chatHistory: { id: string, sender: 'user' | 'mushu', text: string, timestamp: string }[];
   relationship: number; // 0-100 friendship level
+  userPreferences: {
+    topics: string[];
+    interests: string[];
+    learningGoals: string[];
+  };
 }
 
 interface MushuContextType {
@@ -24,9 +29,11 @@ interface MushuContextType {
   updateMood: (emotion: EmotionRecord['emotion']) => void;
   addChatMessage: (sender: 'user' | 'mushu', text: string) => void;
   getChatHistory: () => MushuState['chatHistory'];
+  clearChatHistory: () => void;
   unlockAccessory: (id: string) => void;
   equipAccessory: (id: string, equipped: boolean) => void;
   getEquippedAccessories: () => MushuAccessory[];
+  updateUserPreferences: (preferences: Partial<MushuState['userPreferences']>) => void;
 }
 
 const MushuContext = createContext<MushuContextType | undefined>(undefined);
@@ -45,7 +52,12 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       { id: 'a5', name: 'Beach Background', type: 'background', imageUrl: '/accessories/beach.png', unlocked: false, equipped: false }
     ],
     chatHistory: [],
-    relationship: 50
+    relationship: 50,
+    userPreferences: {
+      topics: [],
+      interests: [],
+      learningGoals: []
+    }
   };
   
   const [mushuState, setMushuState] = useState<MushuState>(defaultMushuState);
@@ -116,12 +128,33 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     const updatedHistory = [...mushuState.chatHistory, newMessage];
     
-    // Limit chat history to last 50 messages
-    if (updatedHistory.length > 50) {
-      updatedHistory.shift();
+    // Incrementar la relación con Mushu cuando el usuario escribe mensajes
+    let relationshipBonus = 0;
+    if (sender === 'user') {
+      relationshipBonus = 1; // Pequeño incremento por cada mensaje
+      
+      // Bonos extras por mensajes positivos o agradecimientos
+      if (text.toLowerCase().includes('gracias') || 
+          text.toLowerCase().includes('genial') || 
+          text.toLowerCase().includes('te quiero')) {
+        relationshipBonus += 2;
+      }
     }
     
-    const updatedState = { ...mushuState, chatHistory: updatedHistory };
+    const updatedRelationship = Math.min(100, mushuState.relationship + relationshipBonus);
+    
+    const updatedState = { 
+      ...mushuState, 
+      chatHistory: updatedHistory,
+      relationship: updatedRelationship
+    };
+    
+    setMushuState(updatedState);
+    saveMushuState(updatedState);
+  };
+  
+  const clearChatHistory = () => {
+    const updatedState = { ...mushuState, chatHistory: [] };
     setMushuState(updatedState);
     saveMushuState(updatedState);
   };
@@ -160,6 +193,17 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveMushuState(updatedState);
   };
   
+  const updateUserPreferences = (preferences: Partial<MushuState['userPreferences']>) => {
+    const updatedPreferences = {
+      ...mushuState.userPreferences,
+      ...preferences
+    };
+    
+    const updatedState = { ...mushuState, userPreferences: updatedPreferences };
+    setMushuState(updatedState);
+    saveMushuState(updatedState);
+  };
+  
   const getEquippedAccessories = () => mushuState.accessories.filter(acc => acc.unlocked && acc.equipped);
   
   const value = {
@@ -167,9 +211,11 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     updateMood,
     addChatMessage,
     getChatHistory,
+    clearChatHistory,
     unlockAccessory,
     equipAccessory,
-    getEquippedAccessories
+    getEquippedAccessories,
+    updateUserPreferences
   };
   
   return <MushuContext.Provider value={value}>{children}</MushuContext.Provider>;
