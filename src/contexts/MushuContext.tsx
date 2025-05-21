@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useUser } from './UserContext';
 import { useEmotion, EmotionRecord } from './EmotionContext';
@@ -129,12 +128,23 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         mood = 'normal';
     }
     
-    // También actualiza los patrones emocionales en learningData
-    const updatedEmotionalPatterns = { ...mushuState.learningData.emotionalPatterns };
+    // Initialize emotional patterns if not present
+    const updatedEmotionalPatterns = { 
+      ...((mushuState.learningData && mushuState.learningData.emotionalPatterns) || {}) 
+    };
     updatedEmotionalPatterns[emotion] = (updatedEmotionalPatterns[emotion] || 0) + 1;
     
+    // Ensure learningData exists with proper structure
+    const currentLearningData = mushuState.learningData || {
+      mentionedTopics: {},
+      favoriteActivities: {},
+      emotionalPatterns: {},
+      conversationCount: 0,
+      lastInteractionDate: null
+    };
+    
     const updatedLearningData = {
-      ...mushuState.learningData,
+      ...currentLearningData,
       emotionalPatterns: updatedEmotionalPatterns
     };
     
@@ -176,10 +186,19 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     const updatedRelationship = Math.min(100, mushuState.relationship + relationshipBonus);
     
+    // Ensure learningData exists with proper structure
+    const currentLearningData = mushuState.learningData || {
+      mentionedTopics: {},
+      favoriteActivities: {},
+      emotionalPatterns: {},
+      conversationCount: 0,
+      lastInteractionDate: null
+    };
+    
     // Actualizar el contador de conversaciones
     const updatedLearningData = {
-      ...mushuState.learningData,
-      conversationCount: sender === 'user' ? mushuState.learningData.conversationCount + 1 : mushuState.learningData.conversationCount,
+      ...currentLearningData,
+      conversationCount: sender === 'user' ? currentLearningData.conversationCount + 1 : currentLearningData.conversationCount,
       lastInteractionDate: new Date().toISOString()
     };
     
@@ -252,7 +271,17 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!text) return;
     
     const lowerText = text.toLowerCase();
-    const updatedLearningData = { ...mushuState.learningData };
+    
+    // Ensure learningData exists with proper structure
+    const currentLearningData = mushuState.learningData || {
+      mentionedTopics: {},
+      favoriteActivities: {},
+      emotionalPatterns: {},
+      conversationCount: 0,
+      lastInteractionDate: null
+    };
+    
+    const updatedLearningData = { ...currentLearningData };
     
     // Detectar temas mencionados
     const topicKeywords: Record<string, string[]> = {
@@ -271,6 +300,10 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       'socialización': ['amigos', 'salir', 'fiesta', 'reunión', 'socializar'],
       'creatividad': ['arte', 'dibujar', 'pintar', 'música', 'tocar', 'crear']
     };
+    
+    // Initialize if not present
+    updatedLearningData.mentionedTopics = updatedLearningData.mentionedTopics || {};
+    updatedLearningData.favoriteActivities = updatedLearningData.favoriteActivities || {};
     
     // Actualizar temas mencionados
     Object.entries(topicKeywords).forEach(([topic, keywords]) => {
@@ -301,12 +334,22 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const getPersonalizedResponse = (userMessage: string): string => {
     const userName = user?.name || 'Usuario';
     const lowerMessage = userMessage.toLowerCase();
-    const { mentionedTopics, favoriteActivities, conversationCount } = mushuState.learningData;
+    
+    // Ensure learningData exists with proper structure before accessing its properties
+    const currentLearningData = mushuState.learningData || {
+      mentionedTopics: {},
+      favoriteActivities: {},
+      emotionalPatterns: {},
+      conversationCount: 0,
+      lastInteractionDate: null
+    };
+    
+    const { mentionedTopics, favoriteActivities, conversationCount } = currentLearningData;
     
     // Encontrar el tema más mencionado
     let favoriteTopics: string[] = [];
     let maxCount = 0;
-    Object.entries(mentionedTopics).forEach(([topic, count]) => {
+    Object.entries(mentionedTopics || {}).forEach(([topic, count]) => {
       if (count > maxCount) {
         favoriteTopics = [topic];
         maxCount = count;
@@ -318,7 +361,7 @@ export const MushuProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Encontrar la actividad favorita
     let favoriteActivity = '';
     maxCount = 0;
-    Object.entries(favoriteActivities).forEach(([activity, count]) => {
+    Object.entries(favoriteActivities || {}).forEach(([activity, count]) => {
       if (count > maxCount) {
         favoriteActivity = activity;
         maxCount = count;
