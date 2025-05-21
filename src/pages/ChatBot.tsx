@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,19 +8,28 @@ import { useMission } from '../contexts/MissionContext';
 import { useEmotion } from '../contexts/EmotionContext';
 import { useUser } from '../contexts/UserContext';
 import MushuAvatar from '../components/MushuAvatar';
+import RPGDialog from '../components/RPGDialog';
 import { ArrowLeft, Send, Trash2 } from 'lucide-react';
 
 const ChatBot: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useUser();
-  const { mushuState, addChatMessage, getChatHistory, clearChatHistory } = useMushu();
+  const { 
+    mushuState, 
+    addChatMessage, 
+    getChatHistory, 
+    clearChatHistory,
+    analyzeUserMessage,
+    getPersonalizedResponse
+  } = useMushu();
   const { currentEmotion } = useEmotion();
   const { getActiveMissions } = useMission();
   
   const [message, setMessage] = useState<string>('');
   const [chatHistory, setChatHistory] = useState(getChatHistory());
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [showInfo, setShowInfo] = useState(false);
   
   const chatContainerRef = useRef<HTMLDivElement>(null);
   
@@ -41,25 +49,28 @@ const ChatBot: React.FC = () => {
   useEffect(() => {
     if (chatHistory.length === 0) {
       setTimeout(() => {
-        let greeting = "¡Hola! Soy Mushu, tu compañero. ¿En qué te puedo ayudar hoy?";
+        let greeting = `¡Hola${user?.name ? `, ${user.name}` : ''}! Soy Mushu, tu compañero. ¿En qué te puedo ayudar hoy?`;
         
         // Personalize based on emotion if available
         if (currentEmotion) {
           switch(currentEmotion.emotion) {
             case 'happy':
-              greeting = "¡Veo que estás feliz hoy! ¿Quieres contarme más sobre tu día?";
+              greeting = `¡Veo que estás feliz hoy${user?.name ? `, ${user.name}` : ''}! ¿Quieres contarme más sobre tu día?`;
               break;
             case 'sad':
-              greeting = "Noto que estás un poco triste. Estoy aquí para escucharte si necesitas hablar.";
+              greeting = `Noto que estás un poco triste${user?.name ? `, ${user.name}` : ''}. Estoy aquí para escucharte si necesitas hablar.`;
               break;
             case 'angry':
-              greeting = "Parece que estás molesto hoy. ¿Hay algo en particular que te esté afectando?";
+              greeting = `Parece que estás molesto hoy${user?.name ? `, ${user.name}` : ''}. ¿Hay algo en particular que te esté afectando?`;
               break;
             case 'anxious':
-              greeting = "Percibo algo de ansiedad. ¿Te gustaría que te ayude con algunas técnicas de relajación?";
+              greeting = `Percibo algo de ansiedad${user?.name ? `, ${user.name}` : ''}. ¿Te gustaría que te ayude con algunas técnicas de relajación?`;
               break;
             default:
-              // Keep default greeting
+              // Keep default greeting with user name if available
+              if (user?.name) {
+                greeting = `¡Hola, ${user.name}! Soy Mushu, tu compañero. ¿En qué te puedo ayudar hoy?`;
+              }
           }
         }
         
@@ -84,6 +95,9 @@ const ChatBot: React.FC = () => {
   };
   
   const generateMushuResponse = (userMessage: string) => {
+    // Analyze user message to learn from it (this updates the learning data)
+    analyzeUserMessage(userMessage);
+    
     const lowerMessage = userMessage.toLowerCase();
     const userContext = {
       name: user?.name || 'Usuario',
@@ -94,90 +108,59 @@ const ChatBot: React.FC = () => {
     
     let response = '';
     
-    // Enhanced response system that considers user context and chat history
-    if (lowerMessage.includes('hola') || lowerMessage.includes('hey') || lowerMessage.includes('saludos')) {
-      if (chatHistory.length > 5) {
-        response = `¡Hola de nuevo, ${userContext.name}! ¿En qué más puedo ayudarte hoy?`;
-      } else {
-        response = `¡Hola, ${userContext.name}! ¿Cómo puedo ayudarte hoy?`;
-      }
-    }
-    else if (lowerMessage.includes('cómo estás') || lowerMessage.includes('como estas')) {
-      response = "¡Estoy muy bien, gracias por preguntar! Estoy aquí para ayudarte en lo que necesites. ¿Y tú cómo te sientes hoy?";
-    }
-    else if (lowerMessage.includes('triste') || lowerMessage.includes('mal') || lowerMessage.includes('deprimido')) {
-      response = "Lamento que te sientas así. Recuerda que es normal tener días difíciles. ¿Te gustaría hablar sobre ello o prefieres que te sugiera alguna actividad para animarte?";
-    }
-    else if (lowerMessage.includes('feliz') || lowerMessage.includes('bien') || lowerMessage.includes('contento')) {
-      response = `¡Me alegra mucho escuchar eso, ${userContext.name}! ¿Hay algo en especial que haya contribuido a tu buen ánimo?`;
-    }
-    else if (lowerMessage.includes('gracias') || lowerMessage.includes('te quiero')) {
-      response = "¡De nada! Siempre es un placer ayudarte. Estoy aquí para apoyarte en tu viaje. ¿Hay algo más en lo que pueda asistirte?";
-    }
-    else if (lowerMessage.includes('misión') || lowerMessage.includes('tarea') || lowerMessage.includes('objetivo')) {
-      const activeMissions = getActiveMissions();
-      if (activeMissions.length > 0) {
-        response = `Tienes ${activeMissions.length} misiones pendientes. La próxima es: "${activeMissions[0].title}". ¡Ánimo, ${userContext.name}, sé que puedes completarla!`;
-      } else {
-        response = `¡No tienes misiones pendientes, ${userContext.name}! ¿Te gustaría crear una nueva?`;
-      }
-    }
-    else if (lowerMessage.includes('mindfulness') || lowerMessage.includes('meditación') || lowerMessage.includes('meditar')) {
-      response = "El mindfulness y la meditación son excelentes prácticas para mejorar tu bienestar. Te recomiendo visitar el Jardín Mindfulness, donde encontrarás actividades guiadas. ¿Te gustaría ir allí ahora?";
-    }
-    else if (lowerMessage.includes('ejercicio') || lowerMessage.includes('gimnasio') || lowerMessage.includes('entrenar')) {
-      response = "El ejercicio físico es fundamental para mantener un equilibrio mental y físico. En el gimnasio encontrarás rutinas adaptadas a tus necesidades. ¿Quieres que te acompañe allí?";
-    }
-    else if (lowerMessage.includes('consejo') || lowerMessage.includes('ayuda')) {
-      const tips = [
-        `${userContext.name}, recuerda tomar pequeños descansos durante el día para recargar energía.`,
-        "La respiración profunda es una excelente técnica para manejar momentos de estrés. Inhala por 4 segundos, mantén por 4 y exhala por 6.",
-        `Celebra tus pequeños logros, ${userContext.name}. ¡Cada paso cuenta en tu desarrollo!`,
-        "Mantener una rutina regular puede ayudarte a sentirte más estable y en control.",
-        "No olvides hidratarte y alimentarte adecuadamente durante el día. Tu cuerpo te lo agradecerá."
-      ];
+    // Usar sistema de respuestas inteligentes basados en el historial de aprendizaje
+    if (lowerMessage.includes('info') || lowerMessage.includes('ayuda') || lowerMessage.includes('datos')) {
+      setShowInfo(true);
+      response = "He abierto un panel informativo para ti. Aquí puedes ver información sobre cómo te puedo ayudar.";
+    } else {
+      // Usar getPersonalizedResponse para obtener una respuesta personalizada
+      response = getPersonalizedResponse(userMessage);
       
-      // Choose tip based on their emotional state if available
-      if (userContext.emotion === 'anxious') {
-        response = "Para momentos de ansiedad, te sugiero practicar la técnica 5-4-3-2-1: identifica 5 cosas que puedes ver, 4 que puedes tocar, 3 que puedes oír, 2 olores y 1 sabor. Esto te ayudará a anclarte al presente.";
-      } else if (userContext.emotion === 'sad') {
-        response = "Cuando nos sentimos tristes, a veces ayuda cambiar el entorno. ¿Qué te parece dar un pequeño paseo o abrir las ventanas para dejar entrar aire fresco?";
-      } else {
-        response = tips[Math.floor(Math.random() * tips.length)];
-      }
-    }
-    else if (lowerMessage.includes('chiste') || lowerMessage.includes('broma')) {
-      const jokes = [
-        "¿Por qué los pájaros no usan Facebook? Porque ya tienen Twitter.",
-        "¿Qué hace una abeja en el gimnasio? ¡Zum-ba!",
-        "¿Sabes qué le dice un jaguar a otro? Jaguar you.",
-        "¿Por qué el libro de matemáticas se sentía triste? Porque tenía muchos problemas.",
-        "¿Qué le dice un pez a otro? Nada."
-      ];
-      response = jokes[Math.floor(Math.random() * jokes.length)] + " 😄";
-    }
-    else {
-      // More context-aware generic responses
-      if (chatHistory.length > 10) {
-        // For users with longer chat histories, use more personalized responses
-        const genericResponses = [
-          `Entiendo, ${userContext.name}. ¿Y cómo te hace sentir eso?`,
-          "Gracias por compartir eso conmigo. ¿Hay algo específico en lo que pueda ayudarte al respecto?",
-          `Interesante perspectiva, ${userContext.name}. ¿Has considerado también...?`,
-          "Estoy procesando lo que me cuentas. ¿Te gustaría profundizar más en este tema?",
-          "Basado en nuestras conversaciones anteriores, creo que podría interesarte explorar más sobre este tema."
-        ];
-        response = genericResponses[Math.floor(Math.random() * genericResponses.length)];
-      } else {
-        // For newer users
-        const genericResponses = [
-          "Eso suena interesante. ¿Podrías contarme más al respecto?",
-          "Estoy escuchando. ¿Hay algo específico que quieras compartir conmigo?",
-          `Gracias por contármelo, ${userContext.name}. Estoy aquí para ayudarte.`,
-          "¿Qué más hay en tu mente hoy?",
-          "Estoy aprendiendo más sobre ti con cada conversación."
-        ];
-        response = genericResponses[Math.floor(Math.random() * genericResponses.length)];
+      // Si la respuesta personalizada es muy genérica, usar el sistema de respuestas específicas
+      if (response.includes("Gracias por compartir eso conmigo")) {
+        // Respuestas específicas para ciertas palabras clave
+        if (lowerMessage.includes('misión') || lowerMessage.includes('tarea') || lowerMessage.includes('objetivo')) {
+          const activeMissions = getActiveMissions();
+          if (activeMissions.length > 0) {
+            response = `Tienes ${activeMissions.length} misiones pendientes. La próxima es: "${activeMissions[0].title}". ¡Ánimo, ${userContext.name}, sé que puedes completarla!`;
+          } else {
+            response = `¡No tienes misiones pendientes, ${userContext.name}! ¿Te gustaría crear una nueva?`;
+          }
+        }
+        else if (lowerMessage.includes('mindfulness') || lowerMessage.includes('meditación') || lowerMessage.includes('meditar')) {
+          response = "El mindfulness y la meditación son excelentes prácticas para mejorar tu bienestar. Te recomiendo visitar el Jardín Mindfulness, donde encontrarás actividades guiadas. ¿Te gustaría ir allí ahora?";
+        }
+        else if (lowerMessage.includes('ejercicio') || lowerMessage.includes('gimnasio') || lowerMessage.includes('entrenar')) {
+          response = "El ejercicio físico es fundamental para mantener un equilibrio mental y físico. En el gimnasio encontrarás rutinas adaptadas a tus necesidades. ¿Quieres que te acompañe allí?";
+        }
+        else if (lowerMessage.includes('consejo') || lowerMessage.includes('ayuda')) {
+          const tips = [
+            `${userContext.name}, recuerda tomar pequeños descansos durante el día para recargar energía.`,
+            "La respiración profunda es una excelente técnica para manejar momentos de estrés. Inhala por 4 segundos, mantén por 4 y exhala por 6.",
+            `Celebra tus pequeños logros, ${userContext.name}. ¡Cada paso cuenta en tu desarrollo!`,
+            "Mantener una rutina regular puede ayudarte a sentirte más estable y en control.",
+            "No olvides hidratarte y alimentarte adecuadamente durante el día. Tu cuerpo te lo agradecerá."
+          ];
+          
+          // Choose tip based on their emotional state if available
+          if (userContext.emotion === 'anxious') {
+            response = "Para momentos de ansiedad, te sugiero practicar la técnica 5-4-3-2-1: identifica 5 cosas que puedes ver, 4 que puedes tocar, 3 que puedes oír, 2 olores y 1 sabor. Esto te ayudará a anclarte al presente.";
+          } else if (userContext.emotion === 'sad') {
+            response = "Cuando nos sentimos tristes, a veces ayuda cambiar el entorno. ¿Qué te parece dar un pequeño paseo o abrir las ventanas para dejar entrar aire fresco?";
+          } else {
+            response = tips[Math.floor(Math.random() * tips.length)];
+          }
+        }
+        else if (lowerMessage.includes('chiste') || lowerMessage.includes('broma')) {
+          const jokes = [
+            "¿Por qué los pájaros no usan Facebook? Porque ya tienen Twitter.",
+            "¿Qué hace una abeja en el gimnasio? ¡Zum-ba!",
+            "¿Sabes qué le dice un jaguar a otro? Jaguar you.",
+            "¿Por qué el libro de matemáticas se sentía triste? Porque tenía muchos problemas.",
+            "¿Qué le dice un pez a otro? Nada."
+          ];
+          response = jokes[Math.floor(Math.random() * jokes.length)] + " 😄";
+        }
       }
     }
     
@@ -198,9 +181,14 @@ const ChatBot: React.FC = () => {
   };
   
   const handleClearChat = () => {
-    if (confirm("¿Estás seguro de que quieres borrar todo el historial de chat?")) {
+    if (confirm("¿Estás seguro de que quieres borrar todo el historial de chat? Esto no afectará lo que Mushu ha aprendido sobre ti.")) {
       clearChatHistory();
+      setShowInfo(false);
     }
+  };
+  
+  const closeInfoPanel = () => {
+    setShowInfo(false);
   };
   
   return (
@@ -241,7 +229,7 @@ const ChatBot: React.FC = () => {
               >
                 {msg.sender === 'mushu' && (
                   <div className="mr-2 flex-shrink-0">
-                    <MushuAvatar size="sm" />
+                    <MushuAvatar size="sm" mood={mushuState.mood} />
                   </div>
                 )}
                 
@@ -254,6 +242,9 @@ const ChatBot: React.FC = () => {
                   `}
                 >
                   {msg.text}
+                  <div className="text-xs text-gray-500 mt-1">
+                    {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                  </div>
                 </div>
                 
                 {msg.sender === 'user' && (
@@ -273,7 +264,7 @@ const ChatBot: React.FC = () => {
           
           {isTyping && (
             <div className="flex items-center mb-4">
-              <MushuAvatar size="sm" />
+              <MushuAvatar size="sm" mood={mushuState.mood} />
               <div className="ml-2 bg-white border border-gray-200 p-3 rounded-lg rounded-tl-none">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-gray-300 rounded-full animate-pulse"></div>
@@ -281,6 +272,37 @@ const ChatBot: React.FC = () => {
                   <div className="w-2 h-2 bg-gray-300 rounded-full animate-pulse delay-200"></div>
                 </div>
               </div>
+            </div>
+          )}
+          
+          {/* Panel informativo */}
+          {showInfo && (
+            <div className="my-4">
+              <RPGDialog 
+                text="¡Hola! Soy Mushu, tu compañero inteligente. Puedo ayudarte con:"
+                speaker="Información"
+                showContinue={false}
+                className="bg-white border border-mushu-primary p-4 rounded-lg shadow-md"
+              >
+                <ul className="list-disc pl-5 mt-2">
+                  <li>Recordarte tus misiones pendientes</li>
+                  <li>Ofrecerte consejos personalizados sobre bienestar</li>
+                  <li>Recomendarte actividades de mindfulness</li>
+                  <li>Sugerirte rutinas de ejercicio</li>
+                  <li>Aprender de nuestras conversaciones para ayudarte mejor</li>
+                </ul>
+                <div className="mt-3 text-sm text-gray-600">
+                  <p>Cuanto más hablemos, mejor te podré conocer y ayudar.</p>
+                </div>
+                <div className="mt-3 text-right">
+                  <Button 
+                    onClick={closeInfoPanel} 
+                    className="rpg-button"
+                  >
+                    Entendido
+                  </Button>
+                </div>
+              </RPGDialog>
             </div>
           )}
         </div>
