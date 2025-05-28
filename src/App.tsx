@@ -8,7 +8,9 @@ import { UserProvider } from "./contexts/UserContext";
 import { MissionProvider } from "./contexts/MissionContext";
 import { EmotionProvider } from "./contexts/EmotionContext";
 import { MushuProvider } from "./contexts/MushuContext";
+import { useState, useEffect } from "react";
 
+import SplashScreen from "./components/SplashScreen";
 import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -27,8 +29,22 @@ import Gym from "./pages/Gym";
 import Mindfulness from "./pages/Mindfulness";
 
 const App = () => {
-  // Create a new QueryClient instance inside the component
+  const [isLoading, setIsLoading] = useState(true);
   const queryClient = new QueryClient();
+
+  // Simular tiempo de carga inicial
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // 3 segundos de pantalla de carga
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Mostrar splash screen durante la carga
+  if (isLoading) {
+    return <SplashScreen />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
