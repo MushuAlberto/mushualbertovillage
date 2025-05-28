@@ -24,11 +24,9 @@ const SplashScreen = () => {
         {/* Barra de carga animada */}
         <div className="w-64 mx-auto">
           <div className="bg-white rounded-full h-3 shadow-inner">
-            <div className="bg-mushu-primary h-3 rounded-full animate-pulse" 
-                 style={{
-                   width: '100%',
-                   animation: 'loading 2s ease-in-out infinite'
-                 }}>
+            <div 
+              className="bg-mushu-primary h-3 rounded-full animate-pulse loading-bar"
+            >
             </div>
           </div>
         </div>
@@ -39,13 +37,20 @@ const SplashScreen = () => {
         </p>
       </div>
       
-      <style jsx>{`
-        @keyframes loading {
-          0% { width: 0%; }
-          50% { width: 70%; }
-          100% { width: 100%; }
-        }
-      `}</style>
+      <style>
+        {`
+          @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+          }
+          
+          .loading-bar {
+            animation: loading 2s ease-in-out infinite;
+            width: 100%;
+          }
+        `}
+      </style>
     </div>
   );
 };
