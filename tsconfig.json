@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Path Aliases */
+    "baseUrl": ".", // Base directory for module resolution is the project root
+    "paths": {
+      "@/*": ["./*"] // Allows '@/App' to resolve to './App.tsx', '@/components/...' to './components/...' etc.
+    }
+  },
+  "include": [
+    // List individual files in the root that are part of your source
+    "index.tsx",
+    "App.tsx",
+    "types.ts",
+    "constants.ts", // The root constants.ts file
+    // List directories containing your source code
+    "pages",
+    "components",
+    "hooks",
+    "services",
+    "utils",
+    "constants" // The 'constants' directory (e.g., for constants/breathingExercises.ts)
+    // vite.config.ts should be handled by tsconfig.node.json
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "exclude": ["node_modules", "dist"] // Ensure build output and node_modules are excluded
+}

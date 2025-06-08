@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "composite": true, // Important because it's referenced by tsconfig.json
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noEmit": true // Typically, vite.config.ts is not "emitted" as a separate JS file by tsc
+  },
+  "include": ["vite.config.ts"] // Only include files that run in Node.js environment
+}
